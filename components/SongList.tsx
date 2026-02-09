@@ -49,9 +49,9 @@ const styles: Record<string, CSSProperties> = {
     },
     tableHeader: {
         display: 'grid',
-        gridTemplateColumns: '40px 1fr 1fr 40px 80px',
-        gap: '16px',
-        padding: '12px 16px',
+        gridTemplateColumns: '32px 1fr 80px',
+        gap: '12px',
+        padding: '8px 12px',
         borderBottom: '1px solid #282828',
         fontSize: '11px',
         textTransform: 'uppercase',
@@ -60,9 +60,9 @@ const styles: Record<string, CSSProperties> = {
     },
     songRow: {
         display: 'grid',
-        gridTemplateColumns: '40px 1fr 1fr 40px 80px',
-        gap: '16px',
-        padding: '8px 16px',
+        gridTemplateColumns: '32px 1fr 60px',
+        gap: '12px',
+        padding: '8px 12px',
         alignItems: 'center',
         cursor: 'pointer',
         borderRadius: '4px',
@@ -83,6 +83,13 @@ const styles: Record<string, CSSProperties> = {
         alignItems: 'center',
         gap: '12px',
         minWidth: 0,
+        overflow: 'hidden',
+    },
+    titleInfo: {
+        display: 'flex',
+        flexDirection: 'column',
+        minWidth: 0,
+        flex: 1,
     },
     titleText: {
         fontSize: '14px',
@@ -93,7 +100,7 @@ const styles: Record<string, CSSProperties> = {
         whiteSpace: 'nowrap',
     },
     artistText: {
-        fontSize: '14px',
+        fontSize: '12px',
         color: '#9ca3af',
         margin: 0,
         overflow: 'hidden',
@@ -101,7 +108,7 @@ const styles: Record<string, CSSProperties> = {
         whiteSpace: 'nowrap',
     },
     timeText: {
-        fontSize: '14px',
+        fontSize: '13px',
         color: '#9ca3af',
         textAlign: 'right' as const,
     },
@@ -266,12 +273,10 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                 </form>
             )}
 
-            {/* Table Header */}
-            <div style={styles.tableHeader as CSSProperties}>
+            {/* Table Header - Hidden on mobile, simplified */}
+            <div style={styles.tableHeader as CSSProperties} className="song-table-header">
                 <span style={{ textAlign: 'center' }}>#</span>
                 <span>TITLE</span>
-                <span>ARTIST</span>
-                <span></span>
                 <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Clock size={14} />
                 </span>
@@ -286,6 +291,7 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                 return (
                     <div
                         key={song.id}
+                        className="song-row"
                         style={{
                             ...styles.songRow,
                             backgroundColor: isHovered ? 'rgba(255,255,255,0.1)' :
@@ -295,6 +301,7 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                         onMouseEnter={() => setHoveredRow(song.id)}
                         onMouseLeave={() => setHoveredRow(null)}
                     >
+                        {/* Index */}
                         <span style={{
                             ...styles.indexText,
                             color: isPlaying ? '#FE5F6F' : '#9ca3af',
@@ -302,6 +309,7 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                             {index + 1}
                         </span>
 
+                        {/* Title + Artist (stacked) */}
                         <div style={styles.titleContainer}>
                             <img
                                 src={song.image}
@@ -311,34 +319,37 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                                     e.currentTarget.src = `https://picsum.photos/seed/${song.id}/40`;
                                 }}
                             />
-                            <p style={{
-                                ...styles.titleText,
-                                color: isPlaying ? '#FE5F6F' : '#ffffff',
-                            }}>
-                                {song.title}
-                            </p>
+                            <div style={styles.titleInfo}>
+                                <p style={{
+                                    ...styles.titleText,
+                                    color: isPlaying ? '#FE5F6F' : '#ffffff',
+                                }}>
+                                    {song.title}
+                                </p>
+                                <p style={styles.artistText}>{song.artist}</p>
+                            </div>
+                            {/* Like button - inline on hover */}
+                            <button
+                                onClick={(e) => toggleLike(song, e)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '4px',
+                                    opacity: isHovered || isLiked ? 1 : 0,
+                                    transition: 'opacity 0.15s',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Heart
+                                    size={16}
+                                    fill={isLiked ? '#1DB954' : 'transparent'}
+                                    color={isLiked ? '#1DB954' : '#b3b3b3'}
+                                />
+                            </button>
                         </div>
 
-                        <p style={styles.artistText}>{song.artist}</p>
-
-                        <button
-                            onClick={(e) => toggleLike(song, e)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '4px',
-                                opacity: isHovered || isLiked ? 1 : 0,
-                                transition: 'opacity 0.15s',
-                            }}
-                        >
-                            <Heart
-                                size={16}
-                                fill={isLiked ? '#1DB954' : 'transparent'}
-                                color={isLiked ? '#1DB954' : '#b3b3b3'}
-                            />
-                        </button>
-
+                        {/* Duration */}
                         <span style={styles.timeText}>{formatDuration(song.duration)}</span>
                     </div>
                 );

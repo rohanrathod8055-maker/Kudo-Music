@@ -564,15 +564,34 @@ input[type="range"].volume-slider::-moz-range-progress {
 
 /* ===============================
    MOBILE RESPONSIVE OVERRIDES
+   Spotify-like mobile experience
    =============================== */
 
 @media (max-width: 768px) {
+  /* ===== SONG LIST MOBILE ===== */
 
-  /* Page headers - stack buttons */
+  /* Hide table header on mobile - Spotify style */
+  .song-table-header {
+    display: none !important;
+  }
+
+  /* Song rows - more compact */
+  .song-row {
+    padding: 6px 8px !important;
+    gap: 10px !important;
+  }
+
+  /* ===== PAGE HEADERS MOBILE ===== */
+
   .page-header {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 16px !important;
+    padding: 20px 16px !important;
+  }
+
+  .page-header h1 {
+    font-size: 28px !important;
   }
 
   .page-header-buttons {
@@ -583,47 +602,56 @@ input[type="range"].volume-slider::-moz-range-progress {
 
   .page-header-buttons button {
     flex: 1 1 auto !important;
-    min-width: 120px !important;
-    padding: 10px 16px !important;
+    min-width: 100px !important;
+    padding: 10px 14px !important;
     font-size: 12px !important;
   }
 
-  /* Content padding - less on mobile */
+  /* ===== CONTENT PADDING MOBILE ===== */
+
   .page-content {
-    padding: 0 16px !important;
+    padding: 0 12px !important;
   }
 
-  /* Song cards - 2 columns on mobile */
+  /* ===== SONG GRID MOBILE (Search/Charts) ===== */
+
   .song-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    gap: 10px !important;
   }
 
-  /* Browse categories - full width */
+  /* ===== BROWSE CATEGORIES MOBILE ===== */
+
   .category-card {
-    min-height: 100px !important;
+    min-height: 80px !important;
+    border-radius: 6px !important;
   }
 
-  /* Player bar - compact on mobile */
+  .category-card h3 {
+    font-size: 14px !important;
+  }
+
+  /* ===== PLAYER BAR MOBILE ===== */
+
   .player-bar {
-    padding: 8px 12px !important;
+    padding: 8px 10px !important;
     height: auto !important;
-    min-height: 72px !important;
+    min-height: 64px !important;
   }
 
-  /* Player song info - smaller */
   .player-song-info {
-    max-width: 40% !important;
+    max-width: 45% !important;
+    gap: 8px !important;
   }
 
   .player-song-info img {
-    width: 40px !important;
-    height: 40px !important;
+    width: 36px !important;
+    height: 36px !important;
   }
 
   .player-song-info .song-title {
     font-size: 12px !important;
-    max-width: 100px !important;
+    max-width: 90px !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
@@ -631,55 +659,65 @@ input[type="range"].volume-slider::-moz-range-progress {
 
   .player-song-info .song-artist {
     font-size: 10px !important;
-    max-width: 100px !important;
+    max-width: 90px !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
 
-  /* Player controls - centered and compact */
+  /* Player controls - centered */
   .player-controls {
     flex: 1 !important;
     justify-content: center !important;
+    gap: 8px !important;
   }
 
   .player-controls button {
-    padding: 6px !important;
+    padding: 4px !important;
   }
 
-  /* Hide progress bar on mobile */
+  /* Hide progress bar on mobile player */
   .player-progress {
     display: none !important;
   }
 
-  /* Hide volume controls on mobile */
+  /* Hide volume on mobile */
   .player-volume {
     display: none !important;
   }
 
-  /* Lyrics panel - full screen on mobile */
+  /* ===== LYRICS PANEL MOBILE ===== */
+
   .lyrics-panel {
     width: 100% !important;
     max-width: 100% !important;
     right: 0 !important;
-    border-radius: 0 !important;
+    bottom: 64px !important;
+    border-radius: 16px 16px 0 0 !important;
   }
 
-  /* Playlist page header */
+  /* ===== PLAYLIST PAGE MOBILE ===== */
+
   .playlist-header {
-    padding: 24px 16px !important;
+    padding: 20px 16px !important;
   }
 
   .playlist-header h1 {
     font-size: 24px !important;
   }
 
-  /* Search bar */
+  /* ===== SEARCH BAR MOBILE ===== */
+
   .search-bar {
     max-width: 100% !important;
   }
 
-  /* Hide text on some buttons, show only icons */
+  .search-bar input {
+    font-size: 14px !important;
+  }
+
+  /* ===== UTILITY: Hide text on mobile buttons ===== */
+
   .hide-text-mobile span {
     display: none !important;
   }
