@@ -263,7 +263,11 @@ export function Player() {
     return (
         <>
             {/* Hidden audio element */}
-            <audio ref={audioRef} />
+            <audio
+                ref={audioRef}
+                src={currentSong?.audioUrl}
+                preload="auto"
+            />
 
             {/* Player UI */}
             <div
