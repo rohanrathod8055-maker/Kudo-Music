@@ -6,60 +6,23 @@ import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Music, Check, Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
-    const [step, setStep] = useState<'form' | 'otp'>('form');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
-    const handleSendOTP = async (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            const response = await fetch('/api/auth/send-otp', {
+            const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setStep('otp');
-                setSuccess('OTP sent to your email!');
-                // For development, log OTP to console
-                if (data.devOtp) {
-                    console.log('DEV OTP:', data.devOtp);
-                    setSuccess(`OTP: ${data.devOtp} (dev mode)`);
-                }
-            } else {
-                setError(data.error || 'Failed to send OTP');
-            }
-        } catch (err) {
-            setError('Something went wrong. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerifyOTP = async () => {
-        const otpCode = otp.join('');
-        if (otpCode.length !== 6) return;
-
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch('/api/auth/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, otp: otpCode, name, password }),
+                body: JSON.stringify({ email, name, password }),
             });
 
             const data = await response.json();
@@ -73,33 +36,12 @@ export default function SignupPage() {
                     callbackUrl: '/',
                 });
             } else {
-                setError(data.error || 'Invalid OTP');
+                setError(data.error || 'Failed to create account');
+                setLoading(false);
             }
         } catch (err) {
             setError('Something went wrong. Please try again.');
-        } finally {
             setLoading(false);
-        }
-    };
-
-    const handleOtpChange = (index: number, value: string) => {
-        if (value.length > 1) return;
-
-        const newOtp = [...otp];
-        newOtp[index] = value;
-        setOtp(newOtp);
-
-        // Auto focus next input
-        if (value && index < 5) {
-            const nextInput = document.getElementById(`otp-${index + 1}`);
-            nextInput?.focus();
-        }
-    };
-
-    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            const prevInput = document.getElementById(`otp-${index - 1}`);
-            prevInput?.focus();
         }
     };
 
@@ -158,7 +100,7 @@ export default function SignupPage() {
                         fontWeight: 700,
                         margin: 0,
                     }}>
-                        {step === 'form' ? 'Create account' : 'Verify email'}
+                        Create account
                     </h1>
                     <p style={{
                         color: '#b3b3b3',
@@ -166,324 +108,211 @@ export default function SignupPage() {
                         margin: '8px 0 0 0',
                         textAlign: 'center',
                     }}>
-                        {step === 'form'
-                            ? 'Start your musical journey with Kudo'
-                            : `Enter the code sent to ${email}`}
+                        Start your musical journey with Kudo
                     </p>
                 </div>
 
-                {step === 'form' ? (
-                    <>
-                        {/* Email Form */}
-                        <form onSubmit={handleSendOTP}>
-                            {error && (
-                                <div style={{
-                                    backgroundColor: 'rgba(239,68,68,0.1)',
-                                    border: '1px solid rgba(239,68,68,0.3)',
-                                    borderRadius: '8px',
-                                    padding: '12px 16px',
-                                    marginBottom: '16px',
-                                    color: '#ef4444',
-                                    fontSize: '13px',
-                                }}>
-                                    {error}
-                                </div>
-                            )}
+                {/* Email Form */}
+                <form onSubmit={handleSignup}>
+                    {error && (
+                        <div style={{
+                            backgroundColor: 'rgba(239,68,68,0.1)',
+                            border: '1px solid rgba(239,68,68,0.3)',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            marginBottom: '16px',
+                            color: '#ef4444',
+                            fontSize: '13px',
+                        }}>
+                            {error}
+                        </div>
+                    )}
 
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{
-                                    display: 'block',
-                                    color: '#b3b3b3',
-                                    fontSize: '13px',
-                                    fontWeight: 600,
-                                    marginBottom: '8px',
-                                }}>
-                                    Name
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <User size={18} color="#6b6b6b" style={{
-                                        position: 'absolute',
-                                        left: '16px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                    }} />
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        placeholder="Enter your name"
-                                        required
-                                        style={{
-                                            width: '100%',
-                                            padding: '14px 16px 14px 48px',
-                                            backgroundColor: '#1a1a1a',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '8px',
-                                            color: '#fff',
-                                            fontSize: '14px',
-                                            outline: 'none',
-                                            transition: 'border-color 0.2s',
-                                        }}
-                                        onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                                    />
-                                </div>
-                            </div>
-
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{
-                                    display: 'block',
-                                    color: '#b3b3b3',
-                                    fontSize: '13px',
-                                    fontWeight: 600,
-                                    marginBottom: '8px',
-                                }}>
-                                    Email
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <Mail size={18} color="#6b6b6b" style={{
-                                        position: 'absolute',
-                                        left: '16px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                    }} />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Enter your email"
-                                        required
-                                        style={{
-                                            width: '100%',
-                                            padding: '14px 16px 14px 48px',
-                                            backgroundColor: '#1a1a1a',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '8px',
-                                            color: '#fff',
-                                            fontSize: '14px',
-                                            outline: 'none',
-                                            transition: 'border-color 0.2s',
-                                        }}
-                                        onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                                    />
-                                </div>
-                            </div>
-
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{
-                                    display: 'block',
-                                    color: '#b3b3b3',
-                                    fontSize: '13px',
-                                    fontWeight: 600,
-                                    marginBottom: '8px',
-                                }}>
-                                    Password
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <Lock size={18} color="#6b6b6b" style={{
-                                        position: 'absolute',
-                                        left: '16px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                    }} />
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Create a password (min 8 chars)"
-                                        required
-                                        minLength={8}
-                                        style={{
-                                            width: '100%',
-                                            padding: '14px 48px 14px 48px',
-                                            backgroundColor: '#1a1a1a',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: '8px',
-                                            color: '#fff',
-                                            fontSize: '14px',
-                                            outline: 'none',
-                                            transition: 'border-color 0.2s',
-                                        }}
-                                        onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        style={{
-                                            position: 'absolute',
-                                            right: '16px',
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: 0,
-                                        }}
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff size={18} color="#6b6b6b" />
-                                        ) : (
-                                            <Eye size={18} color="#6b6b6b" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
+                    <div style={{ marginBottom: '16px' }}>
+                        <label style={{
+                            display: 'block',
+                            color: '#b3b3b3',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            marginBottom: '8px',
+                        }}>
+                            Name
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <User size={18} color="#6b6b6b" style={{
+                                position: 'absolute',
+                                left: '16px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                            }} />
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Enter your name"
+                                required
                                 style={{
                                     width: '100%',
-                                    padding: '14px 24px',
-                                    background: 'linear-gradient(135deg, #7B2CBF 0%, #E040FB 100%)',
+                                    padding: '14px 16px 14px 48px',
+                                    backgroundColor: '#1a1a1a',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '8px',
                                     color: '#fff',
+                                    fontSize: '14px',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                        <label style={{
+                            display: 'block',
+                            color: '#b3b3b3',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            marginBottom: '8px',
+                        }}>
+                            Email
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <Mail size={18} color="#6b6b6b" style={{
+                                position: 'absolute',
+                                left: '16px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                            }} />
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email"
+                                required
+                                style={{
+                                    width: '100%',
+                                    padding: '14px 16px 14px 48px',
+                                    backgroundColor: '#1a1a1a',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '8px',
+                                    color: '#fff',
+                                    fontSize: '14px',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '24px' }}>
+                        <label style={{
+                            display: 'block',
+                            color: '#b3b3b3',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            marginBottom: '8px',
+                        }}>
+                            Password
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <Lock size={18} color="#6b6b6b" style={{
+                                position: 'absolute',
+                                left: '16px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                            }} />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Create a password (min 8 chars)"
+                                required
+                                minLength={8}
+                                style={{
+                                    width: '100%',
+                                    padding: '14px 48px 14px 48px',
+                                    backgroundColor: '#1a1a1a',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '8px',
+                                    color: '#fff',
+                                    fontSize: '14px',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#7B2CBF'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '16px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
                                     border: 'none',
-                                    borderRadius: '500px',
-                                    fontSize: '15px',
-                                    fontWeight: 600,
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                    opacity: loading ? 0.7 : 1,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '8px',
-                                    transition: 'transform 0.2s, box-shadow 0.2s',
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (!loading) {
-                                        e.currentTarget.style.transform = 'scale(1.02)';
-                                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(123,44,191,0.4)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    e.currentTarget.style.boxShadow = 'none';
+                                    cursor: 'pointer',
+                                    padding: 0,
                                 }}
                             >
-                                {loading ? 'Sending OTP...' : 'Continue'}
-                                {!loading && <ArrowRight size={18} />}
+                                {showPassword ? (
+                                    <EyeOff size={18} color="#6b6b6b" />
+                                ) : (
+                                    <Eye size={18} color="#6b6b6b" />
+                                )}
                             </button>
-                        </form>
-                    </>
-                ) : (
-                    <>
-                        {/* OTP Input */}
-                        {error && (
-                            <div style={{
-                                backgroundColor: 'rgba(239,68,68,0.1)',
-                                border: '1px solid rgba(239,68,68,0.3)',
-                                borderRadius: '8px',
-                                padding: '12px 16px',
-                                marginBottom: '16px',
-                                color: '#ef4444',
-                                fontSize: '13px',
-                            }}>
-                                {error}
-                            </div>
-                        )}
+                        </div>
+                    </div>
 
-                        {success && (
-                            <div style={{
-                                backgroundColor: 'rgba(34,197,94,0.1)',
-                                border: '1px solid rgba(34,197,94,0.3)',
-                                borderRadius: '8px',
-                                padding: '12px 16px',
-                                marginBottom: '16px',
-                                color: '#22c55e',
-                                fontSize: '13px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                            }}>
-                                <Check size={16} />
-                                {success}
-                            </div>
-                        )}
-
-                        <div style={{
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                            width: '100%',
+                            padding: '14px 24px',
+                            background: 'linear-gradient(135deg, #7B2CBF 0%, #E040FB 100%)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '500px',
+                            fontSize: '15px',
+                            fontWeight: 600,
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            opacity: loading ? 0.7 : 1,
                             display: 'flex',
+                            alignItems: 'center',
                             justifyContent: 'center',
                             gap: '8px',
-                            marginBottom: '24px',
-                        }}>
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    id={`otp-${index}`}
-                                    type="text"
-                                    inputMode="numeric"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                                    style={{
-                                        width: '48px',
-                                        height: '56px',
-                                        textAlign: 'center',
-                                        fontSize: '24px',
-                                        fontWeight: 600,
-                                        backgroundColor: '#1a1a1a',
-                                        border: digit ? '2px solid #7B2CBF' : '1px solid rgba(255,255,255,0.1)',
-                                        borderRadius: '12px',
-                                        color: '#fff',
-                                        outline: 'none',
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={handleVerifyOTP}
-                            disabled={loading || otp.join('').length !== 6}
-                            style={{
-                                width: '100%',
-                                padding: '14px 24px',
-                                background: 'linear-gradient(135deg, #7B2CBF 0%, #E040FB 100%)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '500px',
-                                fontSize: '15px',
-                                fontWeight: 600,
-                                cursor: loading || otp.join('').length !== 6 ? 'not-allowed' : 'pointer',
-                                opacity: loading || otp.join('').length !== 6 ? 0.7 : 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                            }}
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                                    Verifying...
-                                </>
-                            ) : (
-                                <>
-                                    Create account
-                                    <ArrowRight size={18} />
-                                </>
-                            )}
-                        </button>
-
-                        <button
-                            onClick={() => setStep('form')}
-                            style={{
-                                width: '100%',
-                                marginTop: '12px',
-                                padding: '12px',
-                                backgroundColor: 'transparent',
-                                color: '#b3b3b3',
-                                border: 'none',
-                                fontSize: '14px',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            ← Back to form
-                        </button>
-                    </>
-                )}
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!loading) {
+                                e.currentTarget.style.transform = 'scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(123,44,191,0.4)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                                Creating account...
+                            </>
+                        ) : (
+                            <>
+                                Create account
+                                <ArrowRight size={18} />
+                            </>
+                        )}
+                    </button>
+                </form>
 
                 {/* Sign in link */}
                 <p style={{

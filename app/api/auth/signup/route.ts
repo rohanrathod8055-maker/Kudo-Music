@@ -4,30 +4,24 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
     try {
-        const { email, otp, name, password } = await request.json();
+        const { email, name, password } = await request.json();
 
-        if (!email || !otp || !password) {
+        if (!email || !password) {
             return NextResponse.json(
-                { error: 'Email, OTP, and password are required' },
+                { error: 'Email and password are required' },
                 { status: 400 }
             );
         }
 
-        // Verify OTP
-        const { data: otpRecord, error: otpError } = await supabase
-            .from('otps')
+        // Check if user already exists
+        const { data: existingUser } = await supabase
+            .from('users')
             .select('*')
             .eq('email', email)
-            .eq('otp', otp)
             .single();
 
-        if (otpError || !otpRecord) {
-            return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
-        }
-
-        // Check if OTP expired
-        if (new Date(otpRecord.expires_at) < new Date()) {
-            return NextResponse.json({ error: 'OTP expired' }, { status: 400 });
+        if (existingUser) {
+            return NextResponse.json({ error: 'User already exists. Please sign in.' }, { status: 400 });
         }
 
         // Hash password
@@ -40,6 +34,7 @@ export async function POST(request: Request) {
                 email,
                 name: name || email.split('@')[0],
                 password_hash: passwordHash,
+                image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, // Auto-generate avatar
             })
             .select()
             .single();
@@ -48,9 +43,6 @@ export async function POST(request: Request) {
             console.error('Create user error:', userError);
             return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
         }
-
-        // Delete used OTP
-        await supabase.from('otps').delete().eq('email', email);
 
         return NextResponse.json({
             success: true,
@@ -62,7 +54,7 @@ export async function POST(request: Request) {
             },
         });
     } catch (error) {
-        console.error('Verify OTP error:', error);
+        console.error('Signup error:', error);
         return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
 }
