@@ -80,18 +80,26 @@ export function Player() {
         audio.volume = isMuted ? 0 : volume;
     }, [volume, isMuted]);
 
-    // Progress tracking
+    // Progress tracking - use interval for more reliable updates
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
 
         const updateProgress = () => {
-            setProgress(audio.currentTime);
+            if (!audio.paused && !audio.ended) {
+                setProgress(audio.currentTime);
+            }
         };
 
+        // Use both timeupdate event and interval for reliability
         audio.addEventListener('timeupdate', updateProgress);
-        return () => audio.removeEventListener('timeupdate', updateProgress);
-    }, []);
+        const interval = setInterval(updateProgress, 250); // Update 4x per second
+
+        return () => {
+            audio.removeEventListener('timeupdate', updateProgress);
+            clearInterval(interval);
+        };
+    }, [setProgress]);
 
     // Handle song end
     useEffect(() => {
