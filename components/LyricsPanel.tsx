@@ -84,13 +84,21 @@ export function LyricsPanel({ isOpen, onClose }: LyricsPanelProps) {
     useEffect(() => {
         if (!isSynced || lyrics.length === 0) return;
 
+        // Add small offset (0.5s lookahead) to make sync feel more natural
+        const adjustedProgress = progress + 0.5;
+
         // Find the current line based on progress
         let currentLine = -1;
         for (let i = lyrics.length - 1; i >= 0; i--) {
-            if (progress >= lyrics[i].time) {
+            if (adjustedProgress >= lyrics[i].time) {
                 currentLine = i;
                 break;
             }
+        }
+
+        // Log for debugging (remove in production)
+        if (currentLine !== activeLine && currentLine >= 0) {
+            console.log(`Lyrics sync: progress=${progress.toFixed(2)}, line ${currentLine}: "${lyrics[currentLine]?.text?.substring(0, 30)}..."`);
         }
 
         if (currentLine !== activeLine) {
