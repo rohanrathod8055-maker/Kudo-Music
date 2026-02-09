@@ -127,7 +127,7 @@ function SearchContent() {
                         duration: track.duration ? Math.round(track.duration / 1000) : undefined,
                     };
                 })
-                .filter((song: any) => song !== null);
+                .filter((song: any) => song !== null) as Song[];
 
             setSongs(transformedSongs);
         } catch (error) {
