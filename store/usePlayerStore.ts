@@ -6,8 +6,7 @@ export interface Song {
     artist: string;
     album?: string;
     image: string;
-    freefyId: string;
-    youtubeId?: string;
+    audioUrl: string;
     duration?: number;
 }
 
@@ -29,7 +28,6 @@ interface PlayerStore {
 
     // Actions
     setCurrentSong: (song: Song) => void;
-    setYoutubeId: (youtubeId: string) => void;
     togglePlay: () => void;
     setIsPlaying: (playing: boolean) => void;
     setVolume: (volume: number) => void;
@@ -85,12 +83,6 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
             isLoading: true,
         });
     },
-
-    setYoutubeId: (youtubeId) => set((state) => ({
-        currentSong: state.currentSong ? { ...state.currentSong, youtubeId } : null,
-        isPlaying: true,
-        isLoading: false,
-    })),
 
     togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
     setIsPlaying: (playing) => set({ isPlaying: playing }),

@@ -2,19 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Music, Link, Trash2, Play, Clock, X, ListMusic, ExternalLink } from 'lucide-react';
-import { usePlayerStore } from '@/store/usePlayerStore';
+import { usePlayerStore, Song } from '@/store/usePlayerStore';
 import { useToast } from '@/components/Toast';
-
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    album?: string;
-    image: string;
-    freefyId: string;
-    youtubeId?: string;
-    duration?: number;
-}
 
 interface Playlist {
     id: string;

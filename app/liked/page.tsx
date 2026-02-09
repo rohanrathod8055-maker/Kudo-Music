@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Heart, Clock } from 'lucide-react';
-import { usePlayerStore } from '@/store/usePlayerStore';
-
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    album?: string;
-    image: string;
-    freefyId: string;
-    youtubeId?: string;
-    duration?: number;
-}
+import { usePlayerStore, Song } from '@/store/usePlayerStore';
 
 export default function LikedSongsPage() {
     const [likedSongs, setLikedSongs] = useState<Song[]>([]);

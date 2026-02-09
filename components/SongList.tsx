@@ -2,18 +2,7 @@
 
 import { useState, useEffect, CSSProperties } from 'react';
 import { Clock, Search, X, Heart } from 'lucide-react';
-import { usePlayerStore } from '@/store/usePlayerStore';
-
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    album?: string;
-    image: string;
-    freefyId: string;
-    youtubeId?: string;
-    duration?: number;
-}
+import { usePlayerStore, Song } from '@/store/usePlayerStore';
 
 interface SongListProps {
     onSongsLoaded?: (count: number) => void;
@@ -210,7 +199,7 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
     };
 
     const handleSongClick = (song: Song) => {
-        console.log('Playing:', song.title, '| YouTube:', song.youtubeId);
+        console.log('Playing:', song.title);
         setCurrentSong(song);
         setIsPlaying(true);
     };
@@ -319,7 +308,7 @@ export function SongList({ onSongsLoaded, channel = 'discover', showSearch = tru
                                 alt={song.title}
                                 style={styles.thumbnail}
                                 onError={(e) => {
-                                    e.currentTarget.src = `https://picsum.photos/seed/${song.freefyId}/40`;
+                                    e.currentTarget.src = `https://picsum.photos/seed/${song.id}/40`;
                                 }}
                             />
                             <p style={{

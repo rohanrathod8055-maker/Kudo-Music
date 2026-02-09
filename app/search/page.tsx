@@ -12,8 +12,7 @@ interface Song {
     artist: string;
     album?: string;
     image: string;
-    freefyId: string;
-    youtubeId?: string;
+    audioUrl: string;
     duration?: number;
 }
 
@@ -65,81 +64,12 @@ function SearchContent() {
         setSearched(true);
 
         try {
-            // Call Freefy API directly from browser (bypasses server-side blocking)
-            const searchUrl = `https://freefy.app/api/v1/search/${encodeURIComponent(searchQuery.trim())}?limit=50&modelTypes=track`;
-
-            const response = await fetch(searchUrl, {
-                headers: {
-                    'Accept': 'application/json',
-                },
-            });
-
-            const text = await response.text();
-
-            // Check if we got HTML instead of JSON
-            if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-                console.log('Got HTML, trying fallback');
-                // Fallback to our API route
-                const fallbackResponse = await fetch(`/api/songs?q=${encodeURIComponent(searchQuery.trim())}&limit=50`);
-                const fallbackData = await fallbackResponse.json();
-                setSongs(fallbackData.songs || []);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            let tracks: any[] = [];
-
-            // Parse different response formats
-            if (data.results?.tracks?.data) {
-                tracks = data.results.tracks.data;
-            } else if (data.tracks?.data) {
-                tracks = data.tracks.data;
-            } else if (data.results?.data) {
-                tracks = data.results.data.filter((r: any) => r.model_type === 'track');
-            } else if (Array.isArray(data.results)) {
-                tracks = data.results.filter((r: any) => r.model_type === 'track');
-            }
-
-            // Transform tracks to our Song format
-            const transformedSongs = tracks
-                .map((track: any) => {
-                    if (!track.name) return null;
-
-                    const artists = track.artists?.map((a: any) => a.name).join(', ') || 'Unknown Artist';
-                    let imageUrl = track.album?.image || track.image || `https://picsum.photos/seed/${track.id}/300`;
-
-                    // Get YouTube ID
-                    let youtubeId = track.src;
-                    if (youtubeId?.includes('youtube.com/watch?v=')) {
-                        youtubeId = youtubeId.split('v=')[1]?.split('&')[0];
-                    }
-
-                    if (!youtubeId) return null; // Skip songs without YouTube ID
-
-                    return {
-                        id: String(track.id),
-                        title: track.name,
-                        artist: artists,
-                        album: track.album?.name || '',
-                        image: imageUrl,
-                        freefyId: String(track.id),
-                        youtubeId: youtubeId,
-                        duration: track.duration ? Math.round(track.duration / 1000) : undefined,
-                    };
-                })
-                .filter((song: any) => song !== null) as Song[];
-
-            setSongs(transformedSongs);
+            const response = await fetch(`/api/songs?q=${encodeURIComponent(searchQuery.trim())}&limit=50`);
+            const data = await response.json();
+            setSongs(data.songs || []);
         } catch (error) {
             console.error('Search error:', error);
-            // Fallback to API route on error
-            try {
-                const response = await fetch(`/api/songs?q=${encodeURIComponent(searchQuery.trim())}&limit=50`);
-                const data = await response.json();
-                setSongs(data.songs || []);
-            } catch {
-                setSongs([]);
-            }
+            setSongs([]);
         } finally {
             setLoading(false);
         }
@@ -392,7 +322,7 @@ function SearchContent() {
                                                     boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
                                                 }}
                                                 onError={(e) => {
-                                                    e.currentTarget.src = `https://picsum.photos/seed/${song.freefyId}/300`;
+                                                    e.currentTarget.src = `https://picsum.photos/seed/${song.id}/300`;
                                                 }}
                                             />
                                             {/* Play Button Overlay */}
