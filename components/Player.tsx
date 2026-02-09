@@ -419,16 +419,15 @@ export function Player() {
                         </span>
                         <input
                             type="range"
+                            className="progress-slider"
                             min={0}
                             max={duration || 100}
                             value={progress}
                             onChange={handleSeek}
                             style={{
                                 flex: 1,
-                                height: '4px',
-                                cursor: 'pointer',
-                                accentColor: '#1DB954',
-                            }}
+                                '--progress': `${duration ? (progress / duration) * 100 : 0}%`,
+                            } as React.CSSProperties}
                         />
                         <span style={{ color: '#b3b3b3', fontSize: '11px', minWidth: '40px' }}>
                             {formatTime(duration)}
@@ -466,6 +465,7 @@ export function Player() {
                     </button>
                     <input
                         type="range"
+                        className="volume-slider"
                         min={0}
                         max={1}
                         step={0.01}
@@ -475,11 +475,8 @@ export function Player() {
                             setVolume(parseFloat(e.target.value));
                         }}
                         style={{
-                            width: '100px',
-                            height: '4px',
-                            cursor: 'pointer',
-                            accentColor: '#1DB954',
-                        }}
+                            '--volume': `${(isMuted ? 0 : volume) * 100}%`,
+                        } as React.CSSProperties}
                     />
                 </div>
             </div>
