@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music, Shuffle, Repeat, Repeat1 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music, Shuffle, Repeat, Repeat1, Mic2 } from 'lucide-react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 import { mockSongs } from '@/lib/data/songs';
+import { LyricsPanel } from './LyricsPanel';
 
 export function Player() {
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -422,6 +423,20 @@ export function Player() {
 
                 {/* Volume Controls */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '30%', justifyContent: 'flex-end', minWidth: '180px' }}>
+                    {/* Lyrics Button */}
+                    <button
+                        onClick={() => setShowLyrics(!showLyrics)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '8px',
+                            color: showLyrics ? '#1DB954' : '#b3b3b3',
+                        }}
+                        title="Lyrics"
+                    >
+                        <Mic2 size={18} />
+                    </button>
                     <button
                         onClick={toggleMute}
                         style={{
@@ -453,6 +468,14 @@ export function Player() {
                     />
                 </div>
             </div>
+
+            {/* Lyrics Panel */}
+            {showLyrics && currentSong && (
+                <LyricsPanel
+                    isOpen={showLyrics}
+                    onClose={() => setShowLyrics(false)}
+                />
+            )}
         </>
     );
 }
