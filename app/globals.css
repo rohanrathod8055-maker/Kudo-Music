@@ -561,3 +561,126 @@ input[type="range"].volume-slider::-moz-range-progress {
   border-radius: 2px;
   background: #1DB954;
 }
+
+/* ===============================
+   MOBILE RESPONSIVE OVERRIDES
+   =============================== */
+
+@media (max-width: 768px) {
+
+  /* Page headers - stack buttons */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  .page-header-buttons {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+
+  .page-header-buttons button {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    padding: 10px 16px !important;
+    font-size: 12px !important;
+  }
+
+  /* Content padding - less on mobile */
+  .page-content {
+    padding: 0 16px !important;
+  }
+
+  /* Song cards - 2 columns on mobile */
+  .song-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  /* Browse categories - full width */
+  .category-card {
+    min-height: 100px !important;
+  }
+
+  /* Player bar - compact on mobile */
+  .player-bar {
+    padding: 8px 12px !important;
+    height: auto !important;
+    min-height: 72px !important;
+  }
+
+  /* Player song info - smaller */
+  .player-song-info {
+    max-width: 40% !important;
+  }
+
+  .player-song-info img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .player-song-info .song-title {
+    font-size: 12px !important;
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .player-song-info .song-artist {
+    font-size: 10px !important;
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Player controls - centered and compact */
+  .player-controls {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+
+  .player-controls button {
+    padding: 6px !important;
+  }
+
+  /* Hide progress bar on mobile */
+  .player-progress {
+    display: none !important;
+  }
+
+  /* Hide volume controls on mobile */
+  .player-volume {
+    display: none !important;
+  }
+
+  /* Lyrics panel - full screen on mobile */
+  .lyrics-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    right: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Playlist page header */
+  .playlist-header {
+    padding: 24px 16px !important;
+  }
+
+  .playlist-header h1 {
+    font-size: 24px !important;
+  }
+
+  /* Search bar */
+  .search-bar {
+    max-width: 100% !important;
+  }
+
+  /* Hide text on some buttons, show only icons */
+  .hide-text-mobile span {
+    display: none !important;
+  }
+}

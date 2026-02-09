@@ -34,6 +34,7 @@ export function Player() {
         playPrevious,
         addManyToQueue,
         setLastSearchQuery,
+        setCurrentSong,
         history,
     } = usePlayerStore();
 
@@ -202,35 +203,36 @@ export function Player() {
             return;
         }
 
-        // If auto-play is enabled and no queue, fetch similar songs
-        if (autoPlayEnabled && currentSong) {
-            const searchQuery = lastSearchQuery || currentSong.artist;
+        // Fetch random songs (not based on current song)
+        if (currentSong) {
+            // Random search terms for variety
+            const randomQueries = ['pop hits', 'rock', 'hip hop', 'bollywood', 'drake', 'taylor swift', 'arijit singh', 'ed sheeran', 'the weeknd', 'dua lipa', 'bad bunny', 'ariana grande', 'justin bieber', 'billie eilish'];
+            const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
 
             try {
-                const response = await fetch(`/api/songs?q=${encodeURIComponent(searchQuery)}&limit=10`);
+                const response = await fetch(`/api/songs?q=${encodeURIComponent(randomQuery)}&limit=20`);
                 const data = await response.json();
 
                 if (data.songs?.length > 0) {
-                    const historyIds = new Set(history.map(s => s.id));
-                    const newSongs = data.songs.filter(
-                        (s: any) => s.id !== currentSong.id && !historyIds.has(s.id)
-                    );
+                    // Pick a random song from results (not just the first one)
+                    const historyIds = new Set([...history.map(s => s.id), currentSong.id]);
+                    const newSongs = data.songs.filter((s: any) => !historyIds.has(s.id));
 
                     if (newSongs.length > 0) {
-                        addManyToQueue(newSongs);
-                        playNext();
+                        const randomIndex = Math.floor(Math.random() * Math.min(newSongs.length, 10));
+                        const randomSong = newSongs[randomIndex];
+                        setCurrentSong(randomSong);
                         return;
                     }
                 }
             } catch (error) {
-                console.error('Failed to fetch similar songs:', error);
+                console.error('Failed to fetch random songs:', error);
             }
 
             // Fallback to mock songs
             const randomSong = mockSongs[Math.floor(Math.random() * mockSongs.length)];
-            if (randomSong) {
-                addManyToQueue([randomSong]);
-                playNext();
+            if (randomSong && randomSong.id !== currentSong.id) {
+                setCurrentSong(randomSong);
             }
         }
     };
